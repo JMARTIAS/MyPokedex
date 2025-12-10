@@ -52,7 +52,7 @@ fun MyPokedexTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = Typography, // Use the new Typography
         content = content
     )
 }
