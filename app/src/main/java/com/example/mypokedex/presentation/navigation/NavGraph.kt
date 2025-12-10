@@ -45,7 +45,14 @@ fun NavGraph(navController: NavHostController) {
         }
         composable(route = Screen.Detail.route) {
             DetailScreen(
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.popBackStack() },
+                onLogout = {
+                    navController.navigate(Screen.Auth.route) {
+                        popUpTo(Screen.Home.route) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
         composable(route = Screen.Favorites.route) {
