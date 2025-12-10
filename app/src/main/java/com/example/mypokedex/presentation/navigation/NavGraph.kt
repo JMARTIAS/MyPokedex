@@ -33,6 +33,13 @@ fun NavGraph(navController: NavHostController) {
                 },
                 onFavoritesClick = {
                     navController.navigate(Screen.Favorites.route)
+                },
+                onLogout = {
+                    navController.navigate(Screen.Auth.route) {
+                        popUpTo(Screen.Home.route) {
+                            inclusive = true
+                        }
+                    }
                 }
             )
         }
