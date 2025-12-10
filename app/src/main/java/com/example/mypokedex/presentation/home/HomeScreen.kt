@@ -141,23 +141,32 @@ fun HomeScreen(
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                state = gridState,
-                contentPadding = PaddingValues(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(pokemonList) { pokemon ->
-                    PokemonCard(pokemon = pokemon, onPokemonClick = onPokemonClick)
+            if (searchQuery.isNotEmpty() && pokemonList.isEmpty() && !isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("No results found.")
                 }
-                if (isLoading && searchQuery.isBlank()) {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        Box(
-                            modifier = Modifier.fillMaxWidth().padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    state = gridState,
+                    contentPadding = PaddingValues(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(pokemonList) { pokemon ->
+                        PokemonCard(pokemon = pokemon, onPokemonClick = onPokemonClick)
+                    }
+                    if (isLoading && searchQuery.isBlank()) {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
                         }
                     }
                 }
@@ -187,9 +196,7 @@ fun PokemonCard(pokemon: Pokemon, onPokemonClick: (String) -> Unit) {
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxSize(),
+            modifier = Modifier.padding(8.dp).fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
