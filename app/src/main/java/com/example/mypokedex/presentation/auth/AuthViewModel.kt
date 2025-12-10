@@ -19,6 +19,9 @@ class AuthViewModel @Inject constructor(
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn = _isLoggedIn.asStateFlow()
 
+    private val _loginError = MutableStateFlow<String?>(null)
+    val loginError = _loginError.asStateFlow()
+
     init {
         viewModelScope.launch {
             isLoggedInUseCase().collect {
@@ -27,10 +30,14 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun login(username: String) {
-        viewModelScope.launch {
-            loginUseCase(username)
+    fun login(username: String, password: String) {
+        if (username == "admin" && password == "123") {
+            viewModelScope.launch {
+                loginUseCase(username)
+                _loginError.value = null
+            }
+        } else {
+            _loginError.value = "Invalid credentials. Please try again."
         }
     }
-
 }
