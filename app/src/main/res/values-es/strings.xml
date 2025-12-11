@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mi Pokédex</string>
+    <string name="username">Usuario</string>
+    <string name="password">Contraseña</string>
+    <string name="login">Iniciar Sesión</string>
+    <string name="invalid_credentials">Credenciales inválidas. Por favor, inténtalo de nuevo.</string>
+    <string name="pokedex">Pokédex</string>
+    <string name="search">Buscar</string>
+    <string name="favorites">Favoritos</string>
+    <string name="logout">Cerrar Sesión</string>
+    <string name="search_pokemon">Buscar Pokémon...</string>
+    <string name="close_search">Cerrar búsqueda</string>
+    <string name="more_options">Más opciones</string>
+    <string name="no_results_found">No se encontraron resultados.</string>
+    <string name="back">Atrás</string>
+    <string name="add_to_favorites">Añadir a Favoritos</string>
+    <string name="remove_from_favorites">Quitar de Favoritos</string>
+    <string name="weight">Peso</string>
+    <string name="height">Altura</string>
+    <string name="base_stats">Estadísticas Base</string>
+    <string name="confirm_logout">Cierre de Sesión</string>
+    <string name="are_you_sure_logout">¿Estás seguro de que quieres cerrar sesión?</string>
+    <string name="cancel">Cancelar</string>
+    <string name="select_language">Seleccionar Idioma</string>
+    <string name="english">Inglés</string>
+    <string name="spanish">Español</string>
+    <string name="close">Cerrar</string>
+    <string name="change_language">Cambiar Idioma</string>
+
+    <!-- Stats -->
+    <string name="hp">PS</string>
+    <string name="attack">Ataque</string>
+    <string name="defense">Defensa</string>
+    <string name="special_attack">Ataque Esp.</string>
+    <string name="special_defense">Defensa Esp.</string>
+    <string name="speed">Velocidad</string>
+
+    <!-- Types -->
+    <string name="fire">Fuego</string>
+    <string name="water">Agua</string>
+    <string name="grass">Planta</string>
+    <string name="electric">Eléctrico</string>
+    <string name="ice">Hielo</string>
+    <string name="fighting">Lucha</string>
+    <string name="poison">Veneno</string>
+    <string name="ground">Tierra</string>
+    <string name="flying">Volador</string>
+    <string name="psychic">Psíquico</string>
+    <string name="bug">Bicho</string>
+    <string name="rock">Roca</string>
+    <string name="ghost">Fantasma</string>
+    <string name="dragon">Dragón</string>
+    <string name="dark">Siniestro</string>
+    <string name="steel">Acero</string>
+    <string name="fairy">Hada</string>
+    <string name="normal">Normal</string>
+</resources>

@@ -40,6 +40,9 @@ class DetailViewModel @Inject constructor(
     private val _showLogoutDialog = MutableStateFlow(false)
     val showLogoutDialog = _showLogoutDialog.asStateFlow()
 
+    private val _showLanguageDialog = MutableStateFlow(false)
+    val showLanguageDialog = _showLanguageDialog.asStateFlow()
+
     init {
         viewModelScope.launch {
             val pokemonName = savedStateHandle.get<String>("pokemonName") ?: return@launch
@@ -77,5 +80,13 @@ class DetailViewModel @Inject constructor(
 
     fun onLogoutDismiss() {
         _showLogoutDialog.value = false
+    }
+
+    fun onLanguageClick() {
+        _showLanguageDialog.value = true
+    }
+
+    fun onLanguageDismiss() {
+        _showLanguageDialog.value = false
     }
 }
