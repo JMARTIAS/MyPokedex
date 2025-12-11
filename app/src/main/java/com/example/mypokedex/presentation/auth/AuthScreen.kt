@@ -14,7 +14,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -25,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -55,7 +55,7 @@ fun AuthScreen(
     ) {
         Image(
             painter = painterResource(id = R.drawable.pokedex),
-            contentDescription = "Pokedex Logo",
+            contentDescription = stringResource(id = R.string.pokedex),
             modifier = Modifier.size(120.dp)
         )
 
@@ -64,7 +64,7 @@ fun AuthScreen(
         OutlinedTextField(
             value = username,
             onValueChange = { username = it },
-            label = { Text("Username") },
+            label = { Text(stringResource(id = R.string.username)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             isError = loginError != null,
@@ -76,7 +76,7 @@ fun AuthScreen(
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text(stringResource(id = R.string.password)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
@@ -102,7 +102,7 @@ fun AuthScreen(
                 .height(50.dp),
             shape = RoundedCornerShape(16.dp)
         ) {
-            Text("Login")
+            Text(stringResource(id = R.string.login))
         }
     }
 }

@@ -57,6 +57,7 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -65,6 +66,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.mypokedex.R
 import com.example.mypokedex.domain.model.Pokemon
+import com.example.mypokedex.presentation.LanguageViewModel
+import com.example.mypokedex.presentation.components.LanguageSelectionDialog
 import com.example.mypokedex.presentation.components.LogoutConfirmationDialog
 import java.util.Locale
 
@@ -72,6 +75,7 @@ import java.util.Locale
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
+    languageViewModel: LanguageViewModel = hiltViewModel(),
     onPokemonClick: (String) -> Unit,
     onFavoritesClick: () -> Unit,
     onLogout: () -> Unit
@@ -80,6 +84,9 @@ fun HomeScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
     val showLogoutDialog by viewModel.showLogoutDialog.collectAsState()
+    val showLanguageDialog by viewModel.showLanguageDialog.collectAsState()
+    val language by languageViewModel.language.collectAsState()
+
     val gridState = rememberLazyGridState()
     var isSearchActive by remember { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
@@ -87,6 +94,7 @@ fun HomeScreen(
     DisposableEffect(Unit) {
         onDispose {
             viewModel.onSearchQueryChanged("")
+            viewModel.onLanguageDismiss()
         }
     }
 
@@ -103,6 +111,17 @@ fun HomeScreen(
         )
     }
 
+    if (showLanguageDialog) {
+        LanguageSelectionDialog(
+            currentLanguage = language,
+            onLanguageSelected = {
+                viewModel.onLanguageDismiss()
+                languageViewModel.setLanguage(it)
+            },
+            onDismiss = { viewModel.onLanguageDismiss() }
+        )
+    }
+
     Scaffold(
         topBar = {
             if (isSearchActive) {
@@ -113,7 +132,7 @@ fun HomeScreen(
                     TextField(
                         value = searchQuery,
                         onValueChange = viewModel::onSearchQueryChanged,
-                        placeholder = { Text("Search Pokémon...") },
+                        placeholder = { Text(stringResource(id = R.string.search_pokemon)) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
@@ -122,7 +141,7 @@ fun HomeScreen(
                                 isSearchActive = false
                                 viewModel.onSearchQueryChanged("")
                             }) {
-                                Icon(Icons.Default.Close, contentDescription = "Close search")
+                                Icon(Icons.Default.Close, contentDescription = stringResource(id = R.string.close_search))
                             }
                         },
                         colors = TextFieldDefaults.colors(
@@ -138,7 +157,7 @@ fun HomeScreen(
                 CenterAlignedTopAppBar(
                     title = {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            val titleText = "My Pokédex"
+                            val titleText = stringResource(id = R.string.app_name)
                             val titleStyle = MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.Bold
                             )
@@ -161,33 +180,40 @@ fun HomeScreen(
                             Spacer(modifier = Modifier.height(4.dp))
                             Image(
                                 painter = painterResource(id = R.drawable.pokedex),
-                                contentDescription = "Pokédex Icon",
+                                contentDescription = stringResource(id = R.string.pokedex),
                                 modifier = Modifier.height(30.dp)
                             )
                         }
                     },
                     actions = {
                         IconButton(onClick = { isSearchActive = true }) {
-                            Icon(Icons.Default.Search, contentDescription = "Search")
+                            Icon(Icons.Default.Search, contentDescription = stringResource(id = R.string.search))
                         }
                         IconButton(onClick = { showMenu = !showMenu }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                            Icon(Icons.Default.MoreVert, contentDescription = stringResource(id = R.string.more_options))
                         }
                         DropdownMenu(
                             expanded = showMenu,
                             onDismissRequest = { showMenu = false }
                         ) {
                             DropdownMenuItem(
-                                text = { Text("Favorites") },
+                                text = { Text(stringResource(id = R.string.favorites)) },
                                 onClick = {
                                     onFavoritesClick()
                                     showMenu = false
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Logout") },
+                                text = { Text(stringResource(id = R.string.logout)) },
                                 onClick = {
                                     viewModel.onLogoutClick()
+                                    showMenu = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(id = R.string.change_language)) },
+                                onClick = {
+                                    viewModel.onLanguageClick()
                                     showMenu = false
                                 }
                             )
@@ -204,7 +230,7 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("No results found.")
+                    Text(stringResource(id = R.string.no_results_found))
                 }
             } else {
                 LazyVerticalGrid(
