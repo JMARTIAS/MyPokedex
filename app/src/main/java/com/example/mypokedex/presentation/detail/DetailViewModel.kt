@@ -7,11 +7,14 @@ import com.example.mypokedex.domain.model.PokemonDetail
 import com.example.mypokedex.domain.usecase.AddFavoriteUseCase
 import com.example.mypokedex.domain.usecase.GetPokemonDetailUseCase
 import com.example.mypokedex.domain.usecase.IsFavoriteUseCase
+import com.example.mypokedex.domain.usecase.LogoutUseCase
 import com.example.mypokedex.domain.usecase.RemoveFavoriteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,6 +24,7 @@ class DetailViewModel @Inject constructor(
     private val isFavoriteUseCase: IsFavoriteUseCase,
     private val addFavoriteUseCase: AddFavoriteUseCase,
     private val removeFavoriteUseCase: RemoveFavoriteUseCase,
+    private val logoutUseCase: LogoutUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -29,6 +33,12 @@ class DetailViewModel @Inject constructor(
 
     private val _isFavorite = MutableStateFlow(false)
     val isFavorite = _isFavorite.asStateFlow()
+
+    private val _logoutEvent = Channel<Unit>()
+    val logoutEvent = _logoutEvent.receiveAsFlow()
+
+    private val _showLogoutDialog = MutableStateFlow(false)
+    val showLogoutDialog = _showLogoutDialog.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -51,5 +61,21 @@ class DetailViewModel @Inject constructor(
                 addFavoriteUseCase(pokemon)
             }
         }
+    }
+
+    fun onLogoutClick() {
+        _showLogoutDialog.value = true
+    }
+
+    fun onLogoutConfirm() {
+        viewModelScope.launch {
+            logoutUseCase()
+            _logoutEvent.send(Unit)
+        }
+        _showLogoutDialog.value = false
+    }
+
+    fun onLogoutDismiss() {
+        _showLogoutDialog.value = false
     }
 }

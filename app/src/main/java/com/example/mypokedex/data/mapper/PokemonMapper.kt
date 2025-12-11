@@ -18,10 +18,11 @@ fun PokemonListItemDto.toPokemon(): Pokemon {
 }
 
 fun PokemonDto.toPokemonDetail(): PokemonDetail {
+    val imageUrl = sprites?.other?.officialArtwork?.frontDefault ?: sprites?.front_default ?: ""
     return PokemonDetail(
         id = id,
         name = name,
-        imageUrl = sprites.other.officialArtwork.frontDefault,
+        imageUrl = imageUrl,
         height = height,
         weight = weight,
         abilities = abilities.map { Ability(it.ability.name) },

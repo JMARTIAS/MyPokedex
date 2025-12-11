@@ -1,5 +1,7 @@
 package com.example.mypokedex.presentation.home
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +26,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -36,8 +39,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -47,12 +50,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.example.mypokedex.R
 import com.example.mypokedex.domain.model.Pokemon
+import com.example.mypokedex.presentation.components.LogoutConfirmationDialog
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,14 +79,28 @@ fun HomeScreen(
     val pokemonList by viewModel.pokemonList.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
+    val showLogoutDialog by viewModel.showLogoutDialog.collectAsState()
     val gridState = rememberLazyGridState()
     var isSearchActive by remember { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.onSearchQueryChanged("")
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.logoutEvent.collect {
             onLogout()
         }
+    }
+
+    if (showLogoutDialog) {
+        LogoutConfirmationDialog(
+            onConfirm = { viewModel.onLogoutConfirm() },
+            onDismiss = { viewModel.onLogoutDismiss() }
+        )
     }
 
     Scaffold(
@@ -107,8 +135,37 @@ fun HomeScreen(
                     )
                 }
             } else {
-                TopAppBar(
-                    title = { Text("Pokédex") },
+                CenterAlignedTopAppBar(
+                    title = {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            val titleText = "My Pokédex"
+                            val titleStyle = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold
+                            )
+                            Box {
+                                Text(
+                                    text = titleText,
+                                    style = titleStyle.copy(
+                                        color = Color.White,
+                                        drawStyle = Stroke(width = 5f, join = StrokeJoin.Round)
+                                    )
+                                )
+                                Text(
+                                    text = titleText,
+                                    style = titleStyle.copy(
+                                        color = Color(0xFFD32F2F),
+                                        shadow = Shadow(Color.Black.copy(alpha = 0.6f), offset = Offset(2f, 4f), blurRadius = 6f)
+                                    )
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Image(
+                                painter = painterResource(id = R.drawable.pokedex),
+                                contentDescription = "Pokédex Icon",
+                                modifier = Modifier.height(30.dp)
+                            )
+                        }
+                    },
                     actions = {
                         IconButton(onClick = { isSearchActive = true }) {
                             Icon(Icons.Default.Search, contentDescription = "Search")
@@ -130,7 +187,7 @@ fun HomeScreen(
                             DropdownMenuItem(
                                 text = { Text("Logout") },
                                 onClick = {
-                                    viewModel.logout()
+                                    viewModel.onLogoutClick()
                                     showMenu = false
                                 }
                             )
@@ -141,6 +198,7 @@ fun HomeScreen(
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
+            Spacer(modifier = Modifier.height(8.dp))
             if (searchQuery.isNotEmpty() && pokemonList.isEmpty() && !isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -193,27 +251,50 @@ fun PokemonCard(pokemon: Pokemon, onPokemonClick: (String) -> Unit) {
             .aspectRatio(1f)
             .clickable { onPokemonClick(pokemon.name) },
         shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFF5F5F5)
+        )
     ) {
-        Column(
-            modifier = Modifier.padding(8.dp).fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color.White,
+                            Color(0xFFF5F5F5)
+                        )
+                    )
+                )
         ) {
-            AsyncImage(
-                model = pokemon.imageUrl,
-                contentDescription = pokemon.name,
+            Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "#${pokemon.id} ${pokemon.name.lowercase()}",
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center,
-                maxLines = 1
-            )
+                    .padding(8.dp)
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                AsyncImage(
+                    model = pokemon.imageUrl,
+                    contentDescription = pokemon.name,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                val pokemonName = "#${pokemon.id} ${pokemon.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }}"
+                Text(
+                    text = pokemonName,
+                    style = TextStyle(
+                        color = Color(0xFF424242),
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        shadow = Shadow(Color.White.copy(alpha = 0.7f), offset = Offset(0f, 0f), blurRadius = 4f)
+                    ),
+                    maxLines = 1
+                )
+            }
         }
     }
 }

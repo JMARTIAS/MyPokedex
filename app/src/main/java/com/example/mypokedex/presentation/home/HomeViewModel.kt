@@ -41,6 +41,9 @@ class HomeViewModel @Inject constructor(
     private val _logoutEvent = Channel<Unit>()
     val logoutEvent = _logoutEvent.receiveAsFlow()
 
+    private val _showLogoutDialog = MutableStateFlow(false)
+    val showLogoutDialog = _showLogoutDialog.asStateFlow()
+
     private val searchedPokemonFlow = _searchQuery
         .debounce(500L)
         .distinctUntilChanged()
@@ -97,10 +100,19 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun logout() {
+    fun onLogoutClick() {
+        _showLogoutDialog.value = true
+    }
+
+    fun onLogoutConfirm() {
         viewModelScope.launch {
             logoutUseCase()
             _logoutEvent.send(Unit)
         }
+        _showLogoutDialog.value = false
+    }
+
+    fun onLogoutDismiss() {
+        _showLogoutDialog.value = false
     }
 }
