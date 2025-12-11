@@ -1,3 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">MyPokedex</string>
+    <string name="app_name">My Pokédex</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="invalid_credentials">Invalid credentials. Please try again.</string>
+    <string name="pokedex">Pokédex</string>
+    <string name="search">Search</string>
+    <string name="favorites">Favorites</string>
+    <string name="logout">Logout</string>
+    <string name="search_pokemon">Search Pokémon...</string>
+    <string name="close_search">Close search</string>
+    <string name="more_options">More options</string>
+    <string name="no_results_found">No results found.</string>
+    <string name="back">Back</string>
+    <string name="add_to_favorites">Add to Favorites</string>
+    <string name="remove_from_favorites">Remove from Favorites</string>
+    <string name="weight">Weight</string>
+    <string name="height">Height</string>
+    <string name="base_stats">Base Stats</string>
+    <string name="confirm_logout">Confirm Logout</string>
+    <string name="are_you_sure_logout">Are you sure you want to log out?</string>
+    <string name="cancel">Cancel</string>
+    <string name="select_language">Select Language</string>
+    <string name="english">English</string>
+    <string name="spanish">Spanish</string>
+    <string name="close">Close</string>
+    <string name="change_language">Change Language</string>
+
+    <!-- Stats -->
+    <string name="hp">HP</string>
+    <string name="attack">Attack</string>
+    <string name="defense">Defense</string>
+    <string name="special_attack">Sp. Atk</string>
+    <string name="special_defense">Sp. Def</string>
+    <string name="speed">Speed</string>
+
+    <!-- Types -->
+    <string name="fire">Fire</string>
+    <string name="water">Water</string>
+    <string name="grass">Grass</string>
+    <string name="electric">Electric</string>
+    <string name="ice">Ice</string>
+    <string name="fighting">Fighting</string>
+    <string name="poison">Poison</string>
+    <string name="ground">Ground</string>
+    <string name="flying">Flying</string>
+    <string name="psychic">Psychic</string>
+    <string name="bug">Bug</string>
+    <string name="rock">Rock</string>
+    <string name="ghost">Ghost</string>
+    <string name="dragon">Dragon</string>
+    <string name="dark">Dark</string>
+    <string name="steel">Steel</string>
+    <string name="fairy">Fairy</string>
+    <string name="normal">Normal</string>
 </resources>

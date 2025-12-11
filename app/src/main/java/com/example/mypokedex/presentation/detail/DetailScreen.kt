@@ -21,10 +21,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -44,8 +46,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -54,23 +61,45 @@ import coil.compose.AsyncImage
 import com.example.mypokedex.R
 import com.example.mypokedex.domain.model.PokemonDetail
 import com.example.mypokedex.domain.model.Stat
+import com.example.mypokedex.presentation.LanguageViewModel
+import com.example.mypokedex.presentation.components.LanguageSelectionDialog
 import com.example.mypokedex.presentation.components.LogoutConfirmationDialog
 import java.util.Locale
 
 @Composable
 fun DetailScreen(
     viewModel: DetailViewModel = hiltViewModel(),
+    languageViewModel: LanguageViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
     onLogout: () -> Unit
 ) {
     val pokemonDetail by viewModel.pokemonDetail.collectAsState()
     val isFavorite by viewModel.isFavorite.collectAsState()
     val showLogoutDialog by viewModel.showLogoutDialog.collectAsState()
+    val showLanguageDialog by viewModel.showLanguageDialog.collectAsState()
+    val language by languageViewModel.language.collectAsState()
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.onLanguageDismiss()
+        }
+    }
 
     if (showLogoutDialog) {
         LogoutConfirmationDialog(
             onConfirm = { viewModel.onLogoutConfirm() },
             onDismiss = { viewModel.onLogoutDismiss() }
+        )
+    }
+
+    if (showLanguageDialog) {
+        LanguageSelectionDialog(
+            currentLanguage = language,
+            onLanguageSelected = {
+                viewModel.onLanguageDismiss()
+                languageViewModel.setLanguage(it)
+            },
+            onDismiss = { viewModel.onLanguageDismiss() }
         )
     }
 
@@ -96,6 +125,7 @@ fun DetailScreen(
                     onBackClick = onBackClick,
                     onFavoriteClick = { viewModel.toggleFavorite() },
                     onLogoutClick = { viewModel.onLogoutClick() },
+                    onLanguageClick = { viewModel.onLanguageClick() },
                     isFavorite = isFavorite
                 )
             }
@@ -113,8 +143,11 @@ fun TopBar(
     onBackClick: () -> Unit,
     onFavoriteClick: () -> Unit,
     onLogoutClick: () -> Unit,
+    onLanguageClick: () -> Unit,
     isFavorite: Boolean
 ) {
+    var showMenu by remember { mutableStateOf(false) }
+
     TopAppBar(
         title = { /* No title */ },
         navigationIcon = {
@@ -123,7 +156,7 @@ fun TopBar(
                 .background(Color.Black.copy(alpha = 0.4f))
 
             IconButton(onClick = onBackClick, modifier = iconModifier) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                Icon(Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.back), tint = Color.White)
             }
         },
         actions = {
@@ -131,18 +164,34 @@ fun TopBar(
                 .clip(CircleShape)
                 .background(Color.Black.copy(alpha = 0.4f))
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onFavoriteClick, modifier = iconModifier) {
-                    Icon(
-                        imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = "Favorite",
-                        tint = if (isFavorite) Color.Red else Color.White
-                    )
-                }
-                Spacer(modifier = Modifier.padding(end = 8.dp))
-                IconButton(onClick = onLogoutClick, modifier = iconModifier) {
-                    Icon(Icons.Default.ExitToApp, contentDescription = "Logout", tint = Color.White)
-                }
+            IconButton(onClick = { showMenu = true }, modifier = iconModifier) {
+                Icon(Icons.Default.MoreVert, contentDescription = stringResource(id = R.string.more_options), tint = Color.White)
+            }
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text(if (isFavorite) stringResource(id = R.string.remove_from_favorites) else stringResource(id = R.string.add_to_favorites)) },
+                    onClick = {
+                        onFavoriteClick()
+                        showMenu = false
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(id = R.string.logout)) },
+                    onClick = {
+                        onLogoutClick()
+                        showMenu = false
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(id = R.string.change_language)) },
+                    onClick = {
+                        onLanguageClick()
+                        showMenu = false
+                    }
+                )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
@@ -230,7 +279,7 @@ fun TypeChip(type: String) {
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Text(
-            text = type.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() },
+            text = stringResource(id = getTypeResource(type)),
             color = Color.White,
             fontWeight = FontWeight.Bold
         )
@@ -244,11 +293,11 @@ fun PokemonMeasurements(pokemon: PokemonDetail) {
         horizontalArrangement = Arrangement.SpaceAround
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "Weight", fontWeight = FontWeight.Bold)
+            Text(text = stringResource(id = R.string.weight), fontWeight = FontWeight.Bold)
             Text(text = "${pokemon.weight / 10f} kg")
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "Height", fontWeight = FontWeight.Bold)
+            Text(text = stringResource(id = R.string.height), fontWeight = FontWeight.Bold)
             Text(text = "${pokemon.height / 10f} m")
         }
     }
@@ -258,7 +307,7 @@ fun PokemonMeasurements(pokemon: PokemonDetail) {
 fun PokemonStats(pokemon: PokemonDetail) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "Base Stats",
+            text = stringResource(id = R.string.base_stats),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.fillMaxWidth(),
@@ -289,11 +338,47 @@ fun StatRow(stat: Stat) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(text = stat.name.replaceFirstChar { it.titlecase(Locale.getDefault()) }, modifier = Modifier.weight(0.3f))
+        Text(text = stringResource(id = getStatResource(stat.name)), modifier = Modifier.weight(0.4f))
         LinearProgressIndicator(
             progress = { animatedProgress },
-            modifier = Modifier.weight(0.7f).height(10.dp).clip(CircleShape),
+            modifier = Modifier.weight(0.6f).height(10.dp).clip(CircleShape),
             color = if (stat.value >= 50) Color(0xFF78C850) else Color(0xFFF08030)
         )
+    }
+}
+
+fun getStatResource(statName: String): Int {
+    return when (statName.lowercase()) {
+        "hp" -> R.string.hp
+        "attack" -> R.string.attack
+        "defense" -> R.string.defense
+        "special-attack" -> R.string.special_attack
+        "special-defense" -> R.string.special_defense
+        "speed" -> R.string.speed
+        else -> R.string.hp // Default to HP
+    }
+}
+
+fun getTypeResource(typeName: String): Int {
+    return when (typeName.lowercase()) {
+        "fire" -> R.string.fire
+        "water" -> R.string.water
+        "grass" -> R.string.grass
+        "electric" -> R.string.electric
+        "ice" -> R.string.ice
+        "fighting" -> R.string.fighting
+        "poison" -> R.string.poison
+        "ground" -> R.string.ground
+        "flying" -> R.string.flying
+        "psychic" -> R.string.psychic
+        "bug" -> R.string.bug
+        "rock" -> R.string.rock
+        "ghost" -> R.string.ghost
+        "dragon" -> R.string.dragon
+        "dark" -> R.string.dark
+        "steel" -> R.string.steel
+        "fairy" -> R.string.fairy
+        "normal" -> R.string.normal
+        else -> R.string.normal // Default to Normal
     }
 }

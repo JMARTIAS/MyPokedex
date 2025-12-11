@@ -2,9 +2,9 @@
 
 ## Descripción General
 
-My Pokédex es una aplicación de Android nativa que permite a los usuarios explorar el vasto mundo de Pokémon. La aplicación consume datos de la [PokéAPI](https://pokeapi.co/) y presenta la información de una manera visualmente atractiva y fácil de usar. Los usuarios pueden navegar por una lista infinita de Pokémon, buscar a sus favoritos, ver sus detalles y estadísticas, y guardar sus Pokémon preferidos en una lista de favoritos.
+My Pokédex es una aplicación de Android nativa que permite a los usuarios explorar el vasto mundo de Pokémon. La aplicación consume datos de la [PokéAPI](https://pokeapi.co/) y presenta la información de una manera visualmente atractiva y fácil de usar. Los usuarios pueden navegar por una lista infinita de Pokémon, buscar a sus favoritos, ver sus detalles y estadísticas, y guardar sus Pokémon preferidos en una lista de favoritos. Tambien soporta el cambio de idioma(español/inglés).
 
-La aplicación está desarrollada siguiendo las mejores prácticas de la industria, con un enfoque en la calidad del código, la arquitectura limpia y una experiencia de usuario fluida y receptiva.
+La aplicación está desarrollada siguiendo las mejores prácticas de la actualidad, con un enfoque en la calidad del código, la arquitectura limpia y una experiencia de usuario fluida y receptiva.
 
 ## Arquitectura y Tecnologías
 
@@ -40,6 +40,3 @@ Para instalar y ejecutar la aplicación en un dispositivo Android, sigue estos s
     *   Copia el archivo `app-debug.apk` a tu dispositivo Android (puedes hacerlo a través de un cable USB, Bluetooth, o cualquier servicio en la nube).
     *   En tu dispositivo, ve a la aplicación de `Archivos` (o `Files`) y busca el archivo `app-debug.apk`.
     *   Púlsalo para iniciar la instalación. Es posible que necesites habilitar la opción de "Instalar aplicaciones de fuentes desconocidas" en la configuración de seguridad de tu teléfono.
-
-3.  **¡A Explorar!**
-    *   Una vez instalada, busca el nuevo icono de la Pokédex en tu menú de aplicaciones y ¡listo para usar!

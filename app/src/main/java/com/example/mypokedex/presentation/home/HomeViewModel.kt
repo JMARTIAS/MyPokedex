@@ -44,6 +44,9 @@ class HomeViewModel @Inject constructor(
     private val _showLogoutDialog = MutableStateFlow(false)
     val showLogoutDialog = _showLogoutDialog.asStateFlow()
 
+    private val _showLanguageDialog = MutableStateFlow(false)
+    val showLanguageDialog = _showLanguageDialog.asStateFlow()
+
     private val searchedPokemonFlow = _searchQuery
         .debounce(500L)
         .distinctUntilChanged()
@@ -114,5 +117,13 @@ class HomeViewModel @Inject constructor(
 
     fun onLogoutDismiss() {
         _showLogoutDialog.value = false
+    }
+
+    fun onLanguageClick() {
+        _showLanguageDialog.value = true
+    }
+
+    fun onLanguageDismiss() {
+        _showLanguageDialog.value = false
     }
 }
